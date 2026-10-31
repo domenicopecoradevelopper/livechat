@@ -1,15 +1,13 @@
-<!-- === INIZIO SEZIONE 1: CONFIGURAZIONE INTERFACCIA ED ELIMINAZIONE DIPENDEZZE === -->
-<!-- Questa sezione definisce lo scheletro della pagina e imposta la veste grafica fluida senza richiedere fogli di stile esterni -->
+<!-- === INIZIO SEZIONE 1: CONFIGURAZIONE INTERFACCIA E REGOLE DI STILE === -->
+<!-- Questa sezione definisce la grafica fluida adatta a qualsiasi schermo ed elimina le dipendenze da file esterni -->
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Chat P2P Perfetta ed Efficiente</title>
-    <!-- Caricamento della libreria stabile di PeerJS tramite unpkg -->
-    <script src="https://unpkg.com"></script>
+    <title>Video Chat P2P Standalone con VU Meter</title>
     <style>
-        /* CSS Fluido e Responsive Nativo (Niente blocchi JS per la grafica) */
+        /* CSS Fluido e fully offline (Nessuna dipendenza esterna) */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
         header { background-color: #1e293b; padding: 15px; border-bottom: 1px solid #334155; position: relative; }
@@ -17,9 +15,8 @@
         .header-titles h1 { color: #818cf8; font-size: 1.3rem; font-weight: 700; }
         .header-titles p { color: #94a3b8; font-size: 0.75rem; margin-top: 2px; }
         
-        /* Contenitore principale a griglia liquida adattiva */
         .main-container { flex: 1; max-w: 1280px; width: 100%; margin: 0 auto; padding: 15px; display: grid; grid-template-columns: 1fr; gap: 15px; }
-        @media (min-width: 1024px) { .main-container { grid-template-columns: 3fr 1fr; } }
+        @media (min-width: 1024px) { .main-container { grid-template-columns: 2.5fr 1.5fr; } }
         .left-panel { display: flex; flex-direction: column; gap: 15px; width: 100%; }
     </style>
 </head>
@@ -28,10 +25,9 @@
     <header>
         <div class="header-content">
             <div class="header-titles">
-                <h1>⚡ Video Chat P2P Stabile</h1>
-                <p>Verifica hardware integrata e connessione ad un singolo inserimento d'ID</p>
+                <h1>⚡ Video Chat P2P 100% Autonoma</h1>
+                <p>Nessun server esterno - Connessione WebRTC diretta via file o server statico</p>
             </div>
-            <!-- Pulsante Esci Universale e Sempre Attivo -->
             <button id="btn-exit-global" style="background-color: #dc2626; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: background 0.1s;">❌ ESCI</button>
         </div>
     </header>
@@ -40,35 +36,36 @@
 <!-- === FINE SEZIONE 1: CONFIGURAZIONE RESPONSIVE E STRUTTURA DI BASE === -->
 
 
-<!-- === INIZIO SEZIONE 2: BARRA ID E PLAYER VIDEO ADATTIVI === -->
-<!-- Questa sezione gestisce i moduli per gli ID numerici corti, i comandi di chiamata e la visualizzazione flessibile dei video -->
+<!-- === INIZIO SEZIONE 2: MODULO DI APERTURA CHIAVI ED ELEMENTI VIDEO === -->
+<!-- Gestisce le caselle di testo per lo scambio codici e i riproduttori video con il VU Meter integrato -->
         <div class="left-panel">
             
             <style>
-                /* Pannello comandi flessibile (diventa a colonna singola su smartphone) */
-                .control-bar { background-color: #1e293b; padding: 15px; border-radius: 12px; border: 1px solid #334155; display: flex; flex-wrap: wrap; gap: 15px; }
-                .input-group { flex: 1; min-width: 240px; display: flex; flex-direction: column; }
-                .input-group label { font-size: 0.7rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em; }
-                .action-row { display: flex; gap: 8px; width: 100%; }
+                .control-bar { background-color: #1e293b; padding: 15px; border-radius: 12px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 10px; }
+                .handshake-row { display: flex; flex-direction: column; gap: 8px; }
+                @media (min-width: 768px) { .handshake-row { flex-direction: row; } }
+                .handshake-box { flex: 1; display: flex; flex-direction: column; }
+                .handshake-box label { font-size: 0.7rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; }
                 
-                .id-box { background-color: #020617; border: 1px solid #334155; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 0.95rem; font-weight: 700; color: #a5b4fc; flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; min-height: 38px; }
-                .input-field { background-color: #020617; border: 1px solid #334155; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 0.95rem; color: white; flex: 1; outline: none; text-align: center; }
-                .input-field:focus { border-color: #6366f1; }
+                .textarea-field { background-color: #020617; border: 1px solid #334155; border-radius: 8px; padding: 8px; font-family: monospace; font-size: 0.72rem; color: #a5b4fc; resize: none; height: 65px; width: 100%; outline: none; }
+                .textarea-field:focus { border-color: #6366f1; }
                 
-                .btn { background-color: #4f46e5; color: white; font-weight: 600; font-size: 0.85rem; border: none; padding: 0 16px; border-radius: 8px; cursor: pointer; transition: background 0.1s; display: flex; align-items: center; justify-content: center; min-height: 38px; }
+                .btn-group-row { display: flex; gap: 10px; margin-top: 5px; flex-wrap: wrap; }
+                .btn { background-color: #4f46e5; color: white; font-weight: 600; font-size: 0.8rem; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; transition: background 0.1s; display: flex; align-items: center; justify-content: center; min-height: 36px; }
                 .btn:hover { background-color: #4338ca; }
                 .btn-success { background-color: #059669; }
                 .btn-success:hover { background-color: #047857; }
+                .btn-orange { background-color: #ea580c; }
+                .btn-orange:hover { background-color: #ca8a04; }
                 
-                /* Griglia video fluida che rispetta le proporzioni dello schermo */
                 .video-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
                 @media (min-width: 640px) { .video-grid { grid-template-columns: 1fr 1fr; } }
-                .video-box { background-color: #020617; border-radius: 12px; border: 1px solid #1e293b; aspect-ratio: 4/3; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
+                .video-box { background-color: #020617; border-radius: 12px; border: 1px solid #1e293b; aspect-ratio: 4/3; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; }
                 video { width: 100%; height: 100%; object-fit: cover; background: #020617; }
                 
                 .video-label { position: absolute; bottom: 10px; left: 10px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(4px); padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; border: 1px solid #334155; font-weight: 500; }
                 
-                /* Icone e pallini di stato dinamici */
+                /* Icone con pallini spia integrati */
                 .hardware-overlay { position: absolute; bottom: 10px; right: 10px; display: flex; gap: 8px; background: rgba(15, 23, 42, 0.85); padding: 4px 8px; border-radius: 8px; border: 1px solid #334155; align-items: center; z-index: 15; }
                 .icon-btn { background: none; border: none; color: white; cursor: pointer; font-size: 0.95rem; display: flex; align-items: center; gap: 4px; }
                 .dot-status { width: 7px; height: 7px; border-radius: 50%; display: inline-block; transition: background 0.1s; }
@@ -81,34 +78,35 @@
                 .footer-actions { background-color: #1e293b; padding: 10px; border-radius: 12px; border: 1px solid #334155; display: flex; justify-content: center; }
             </style>
 
-            <!-- Barra dei controlli ID e Chiamata -->
+            <!-- Sistema di Handshake Standalone ad Aggancio Criptato -->
             <div class="control-bar">
-                <div class="input-group">
-                    <label>Il tuo ID Personale (Corto)</label>
-                    <div class="action-row">
-                        <div id="my-id" class="id-box">Configurazione hardware...</div>
-                        <button id="btn-copy" class="btn">Copia</button>
+                <div class="handshake-row">
+                    <div class="handshake-box">
+                        <label>1. Il tuo Codice Locale (Generalo e copialo)</label>
+                        <textarea id="local-sdp" class="textarea-field" readonly placeholder="Clicca su 'Genere Offerta' per creare il codice visivo iniziale..."></textarea>
+                    </div>
+                    <div class="handshake-box">
+                        <label>2. Codice dell'amico (Incollalo qui)</label>
+                        <textarea id="remote-sdp" class="textarea-field" placeholder="Incolla qui la stringa generata dal tuo interlocutore..."></textarea>
                     </div>
                 </div>
-                <div class="input-group">
-                    <label>Chiama un amico</label>
-                    <div class="action-row">
-                        <input type="text" id="remote-id" placeholder="Inserisci ID dell'amico" class="input-field" maxlength="4">
-                        <button id="btn-call" class="btn btn-success">Chiama</button>
-                    </div>
+                <div class="btn-group-row">
+                    <button id="btn-create-offer" class="btn">Genere Offerta (Iniziatore)</button>
+                    <button id="btn-copy-local" class="btn btn-orange">Copia Mio Codice</button>
+                    <button id="btn-accept-remote" class="btn btn-success">Valida Codice Amico</button>
                 </div>
             </div>
 
-            <!-- Box di Streaming Video -->
+            <!-- Griglia dei Flussi Video Real-Time -->
             <div class="video-grid">
                 <div class="video-box">
                     <video id="local-video" autoplay muted playsinline></video>
                     <div class="video-label">Tu (Locale)</div>
-                    <!-- VU METER AUDIO LOCALE ISTANTANEO -->
+                    <!-- VU METER AUDIO LOCALE AD AZIONE DIRETTISSIMA -->
                     <div class="vumeter-container" title="Il tuo volume microfono">
                         <div id="local-vumeter-bar" class="vumeter-bar"></div>
                     </div>
-                    <!-- CONTROLLI AD ICONE CON PALLINO DI STATO DINAMICO -->
+                    <!-- INTERRUTTORI CON PALLINO DI STATO CROMATICO -->
                     <div class="hardware-overlay">
                         <button id="btn-toggle-audio" class="icon-btn">🎙️ <span id="dot-mic" class="dot-status dot-green"></span></button>
                         <button id="btn-toggle-video" class="icon-btn">📷 <span id="dot-cam" class="dot-status dot-green"></span></button>
@@ -125,50 +123,56 @@
                 <button id="btn-share-screen" class="btn">🖥️ Condividi lo Schermo</button>
             </div>
         </div>
-<!-- === FINE SEZIONE 2: BARRA ID E PLAYER VIDEO ADATTIVI === -->
+<!-- === FINE SEZIONE 2: MODULO DI HANDSHAKE MANUALE E VIDEO BOX === -->
 
 
-<!-- === INIZIO SEZIONE 3: CONTENITORE RESPONSIVE CHAT TESTUALE === -->
-<!-- Questa sezione imposta l'interfaccia asincrona per i messaggi, dimensionandoli proporzionalmente alla larghezza del dispositivo in uso -->
+<!-- === INIZIO SEZIONE 3: CONTAINER DELLA CHAT LIVE AFFIANCATA === -->
+<!-- Questa sezione definisce la finestra laterale per lo scambio di messaggi testuali P2P diretti -->
         <style>
             .chat-container { background-color: #1e293b; border-radius: 12px; border: 1px solid #334155; display: flex; flex-direction: column; height: 350px; overflow: hidden; width: 100%; }
             @media (min-width: 1024px) { .chat-container { height: auto; min-height: 450px; } }
             .chat-header { padding: 12px; border-bottom: 1px solid #334155; font-size: 0.8rem; font-weight: 600; color: #818cf8; background-color: rgba(30,41,59,0.4); text-transform: uppercase; letter-spacing: 0.05em; }
             .chat-messages { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background-color: rgba(15,23,42,0.15); }
-            .chat-placeholder { text-align: center; font-style: italic; color: #64748b; font-size: 0.75rem; margin: auto; padding: 10px; }
+            .chat-placeholder { text-align: center; font-style: italic; color: #64748b; font-size: 0.72rem; margin: auto; padding: 10px; line-height: 1.4; }
             .chat-input-bar { padding: 10px; border-top: 1px solid #334155; display: flex; gap: 8px; background-color: rgba(30,41,59,0.4); }
             
             .msg { max-w: 85%; padding: 8px 12px; border-radius: 10px; font-size: 0.75rem; word-break: break-word; line-height: 1.3; }
             .msg-local { background-color: #4f46e5; color: white; align-self: flex-end; border-top-right-radius: 0; }
             .msg-remote { background-color: #334155; color: #f1f5f9; align-self: flex-start; border-top-left-radius: 0; }
-            .msg-system { text-align: center; font-size: 0.65rem; color: #64748b; font-family: monospace; font-style: italic; width: 100%; padding: 2px 0; }
+            .msg-system { text-align: center; font-size: 0.65rem; color: #e2e8f0; background-color: #334155; border-radius: 4px; padding: 4px; width: 100%; font-family: monospace; }
         </style>
 
         <div class="chat-container">
-            <div class="chat-header">💬 Chat Live P2P</div>
+            <div class="chat-header">💬 Chat Live P2P Offline</div>
             <div id="chat-messages" class="chat-messages">
-                <div class="chat-placeholder">Consenti l'uso di telecamera e microfono nel popup del browser. La video chat e lo svuotamento automatico dei messaggi si attiveranno da soli.</div>
+                <div class="chat-placeholder">
+                    <b>GUIDA ALLINEAMENTO MANUALE SENZA SERVER:</b><br>
+                    1. L'utente A clicca su "Genere Offerta", copia il codice e lo invia a B.<br>
+                    2. L'utente B incolla il testo nel box 2 dell'amico. Verrà prodotta la risposta nel box 1.<br>
+                    3. L'utente B copia la sua risposta dal box 1 e la rimanda ad A.<br>
+                    4. L'utente A la incolla nel box 2 e preme su "Valida Codice Amico".
+                </div>
             </div>
             <div class="chat-input-bar">
-                <input type="text" id="chat-input" placeholder="Scrivi messaggio..." class="input-field" style="font-family:sans-serif; padding:8px; font-size:0.75rem; text-align:left;">
+                <input type="text" id="chat-input" placeholder="Scrivi messaggio..." style="background-color:#020617; border:1px solid #334155; border-radius:8px; padding:8px; color:white; font-size:0.75rem; flex:1; outline:none;">
                 <button id="btn-send-chat" class="btn" style="min-height:auto; padding: 0 12px; font-size:0.75rem;">Invia</button>
             </div>
         </div>
 
     </main>
-<!-- === FINE SEZIONE 3: CONTAINER RESPONSIVE CHAT TESTUALE === -->
+<!-- === FINE SEZIONE 3: CONTAINER DELLA CHAT LIVE AFFIANCATA === -->
 
 
-<!-- === INIZIO SEZIONE 4: CODICE LOGICO DI RETE ED ENGINE VU METER LOCALE === -->
-<!-- Questa sezione acquisisce le periferiche e aggancia subito l'analizzatore audio al flusso locale per attivare il VU Meter prima della chiamata -->
+<!-- === INIZIO SEZIONE 4: AVVIO MULTIMEDIALE NATIVO E LOGICA PARSING AUDIO === -->
+<!-- Questo blocco aggancia i flussi audio/video ed avvia immediatamente l'equalizzatore grafico del VU Meter -->
     <script>
-        // Collegamento nodi dell'interfaccia
         const localVideo = document.getElementById('local-video');
         const remoteVideo = document.getElementById('remote-video');
-        const myIdDisplay = document.getElementById('my-id');
-        const remoteIdInput = document.getElementById('remote-id');
-        const btnCall = document.getElementById('btn-call');
-        const btnCopy = document.getElementById('btn-copy');
+        const localSdpTxt = document.getElementById('local-sdp');
+        const remoteSdpTxt = document.getElementById('remote-sdp');
+        const btnCreateOffer = document.getElementById('btn-create-offer');
+        const btnCopyLocal = document.getElementById('btn-copy-local');
+        const btnAcceptRemote = document.getElementById('btn-accept-remote');
         const btnShareScreen = document.getElementById('btn-share-screen');
         const btnToggleAudio = document.getElementById('btn-toggle-audio');
         const btnToggleVideo = document.getElementById('btn-toggle-video');
@@ -180,226 +184,184 @@
         const btnSendChat = document.getElementById('btn-send-chat');
         const localVuBar = document.getElementById('local-vumeter-bar');
 
-        // Stati globali
-        let peer = null;
+        // Stati logici WebRTC standalone puri (Niente PeerJS, rimosso loop server cloud)
         let localStream = null;
         let screenStream = null;
-        let currentCall = null;
-        let currentChatConn = null;
+        let peerConnection = null;
+        let dataChannel = null;
         let isAudioMuted = false;
         let isVideoOff = false;
-
-        // Variabili Web Audio API per il VU Meter
         let audioContext = null;
         let audioAnimationId = null;
 
-        // Avvio asincrono e caricamento immediato dei permessi hardware
-        async function startSystem() {
+        // Configurazione ICE standalone ad aggancio istantaneo protetto
+        const rtcConfig = { iceServers: [{ urls: 'stun:://google.com' }] };
+
+        // Attivazione immediata dell'hardware all'apertura controllata
+        async function startLocalHardware() {
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 localVideo.srcObject = localStream;
-                // ATTIVAZIONE VU METER IMMEDIATA ALL'AVVIO SUL FLUSSO LOCALE
+                
+                // Avvia all'istante l'equalizzazione visiva del VU METER locale
                 attachLocalVuMeter(localStream);
-            } catch (e1) {
-                console.warn("Mancato aggancio combinato, provo solo video...", e1);
-                try {
-                    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-                    localVideo.srcObject = localStream;
-                    dotMic.className = "dot-status dot-red";
-                } catch (e2) {
-                    console.warn("Mancato aggancio video, provo solo audio...", e2);
-                    try {
-                        localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
-                        localVideo.srcObject = localStream;
-                        dotCam.className = "dot-status dot-red";
-                        attachLocalVuMeter(localStream);
-                    } catch (e3) {
-                        console.error("Nessuna periferica disponibile trovata.", e3);
-                        appendLogMessage("⚠️ Esecuzione in sola modalità testuale chat.");
-                        dotMic.className = "dot-status dot-red";
-                        dotCam.className = "dot-status dot-red";
-                    }
-                }
+            } catch (err) {
+                console.warn("Avviso: Periferiche hardware inattive o limitate dal browser in locale", err);
+                appendLogMessage("⚠️ Esecuzione asincrona parziale. Ricorda di concedere l'accesso a microfono e cam nel popup del browser.");
+                dotMic.className = "dot-status dot-red";
+                dotCam.className = "dot-status dot-red";
             }
-            
-            // Inizializza la connessione P2P di PeerJS usando l'ID corto locale forzato nel costruttore cloud
-            initPeerConnection();
+            createPeerInstance();
         }
 
-        // LOGICA DI CALCOLO DEL VU METER LOCALE (FUNZIONA SUBITO ANCHE PRIMA DELLA TRASMISSIONE)
+        function createPeerInstance() {
+            peerConnection = new RTCPeerConnection(rtcConfig);
+
+            if (localStream) {
+                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+            }
+
+            peerConnection.ontrack = (event) => {
+                if (event.streams && event.streams[0]) {
+                    remoteVideo.srcObject = event.streams[0];
+                }
+            };
+
+            peerConnection.ondatachannel = (event) => {
+                dataChannel = event.channel;
+                bindDataChannelEvents();
+            };
+        }
+
+        // ENGINE DI ANALISI MATEMATICA DEL VOLUME MICROFONO (Web Audio API nativa)
         function attachLocalVuMeter(stream) {
             if (audioAnimationId) cancelAnimationFrame(audioAnimationId);
-            if (!stream || stream.getAudioTracks().length === 0) {
-                localVuBar.style.width = "0%";
-                return;
-            }
+            if (!stream || stream.getAudioTracks().length === 0) return;
 
             try {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const source = audioContext.createMediaStreamSource(stream);
                 const analyser = audioContext.createAnalyser();
-                analyser.fftSize = 256; 
+                analyser.fftSize = 256;
                 const bufferLength = analyser.frequencyBinCount;
                 const dataArray = new Uint8Array(bufferLength);
-                
                 source.connect(analyser);
-                
-                function updateMeter() {
-                    // Se la traccia audio locale viene disattivata col tasto Muta, azzera visivamente la barra
+
+                function drawMeter() {
+                    // Se l'utente disattiva l'audio, azzera istantaneamente l'indicatore a schermo
                     if (stream.getAudioTracks().length > 0 && !stream.getAudioTracks().enabled) {
                         localVuBar.style.width = "0%";
-                        audioAnimationId = requestAnimationFrame(updateMeter);
+                        audioAnimationId = requestAnimationFrame(drawMeter);
                         return;
                     }
-
                     analyser.getByteFrequencyData(dataArray);
-                    
                     let total = 0;
                     for (let i = 0; i < bufferLength; i++) { total += dataArray[i]; }
                     const average = total / bufferLength;
-                    let volumePercent = Math.min(100, Math.floor((average / 110) * 100));
                     
-                    localVuBar.style.width = volumePercent + "%";
-                    audioAnimationId = requestAnimationFrame(updateMeter);
+                    // Trasforma i dati in percentuale di riempimento fluida
+                    localVuBar.style.width = Math.min(100, Math.floor((average / 110) * 100)) + "%";
+                    audioAnimationId = requestAnimationFrame(drawMeter);
                 }
-                
-                updateMeter();
-            } catch (err) {
-                console.error("Impossibile agganciare l'analizzatore audio locale:", err);
-            }
+                drawMeter();
+            } catch (e) { console.error("Impossibile sbloccare VU Meter:", e); }
         }
-<!-- === FINE SEZIONE 4: CODICE LOGICO DI RETE ED ENGINE VU METER LOCALE === -->
+<!-- === FINE SEZIONE 4: AVVIO PERIFERICHE STANDALONE E ENGINE VU METER === -->
 
 
-<!-- === INIZIO SEZIONE 5: LOGICA JS - CHIAMATE, ASCOLTO E REFRESH DELLA CHAT === -->
-<!-- Questa parte coordina la generazione dell'ID corto, l'ascolto delle connessioni e la pulizia della chat ad ogni invio -->
-        // Configurazione per generare l'ID corto a 4 cifre in modo sicuro ed accoppiato al server ufficiale di brokering
-        function initPeerConnection() {
-            myIdDisplay.innerText = "Generazione ID...";
+<!-- === INIZIO SEZIONE 5: COMPRESSIONE DISCONNESSIONE E LOGICA REFRESH INPUT CHAT === -->
+<!-- Questa parte compila le stringhe crittografate SDP per stabilire la connessione e pulisce l'input chat ad ogni invio -->
+        // Generazione codice Offerta immediata (Utente A)
+        btnCreateOffer.addEventListener('click', async () => {
+            if (!peerConnection) return;
             
-            // Genera una stringa numerica di 4 cifre localmente
-            const shortId = Math.floor(1000 + Math.random() * 9000).toString();
+            dataChannel = peerConnection.createDataChannel("chatChannel");
+            bindDataChannelEvents();
 
-            // SINTASSI CLOUD FUNZIONANTE: ID personalizzato come stringa iniziale, opzione della chiave di default come secondo argomento
-            peer = new Peer(shortId, {
-                key: 'peerjs',
-                debug: 1,
-                config: {
-                    'iceServers': [
-                        { urls: 'stun:://google.com' },
-                        { urls: 'stun:://google.com' }
-                    ]
-                }
-            });
+            try {
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
 
-            // Handshake completato, mostra l'ID a 4 cifre visibile
-            peer.on('open', (id) => {
-                myIdDisplay.innerText = id;
-            });
-
-            // GESTIONE AUTOMATICA MONO-INSERIMENTO VIDEO (Chi riceve la chiamata)
-            peer.on('call', (call) => {
-                currentCall = call;
-                call.answer(localStream); // Risponde inviando il flusso locale automaticamente
-                call.on('stream', (remoteStream) => {
-                    remoteVideo.srcObject = remoteStream;
-                });
-            });
-
-            // Ascolto connessioni chat in entrata
-            peer.on('connection', (conn) => {
-                currentChatConn = conn;
-                setupChatChannelEvents();
-            });
-
-            // Gestione automatica se per caso il numero random a 4 cifre fosse già occupato sul server pubblico
-            peer.on('error', (err) => {
-                if (err.type === 'unavailable-id') {
-                    console.log("ID occupato, estrazione di un nuovo codice...");
-                    initPeerConnection();
-                } else {
-                    console.error("Errore PeerJS:", err);
-                    myIdDisplay.innerText = "Errore Rete";
-                }
-            });
-        }
-
-        // Apertura canali in uscita (Attivata dall'unico utente che inserisce il codice)
-        btnCall.addEventListener('click', () => {
-            const remoteId = remoteIdInput.value.trim();
-            if (!remoteId) return alert("Per favore inserisci l'ID a 4 cifre del tuo amico.");
-
-            // Connessione dati per la chat
-            currentChatConn = peer.connect(remoteId);
-            setupChatChannelEvents();
-
-            // Avvio chiamata video e ascolto speculare dello stream di ritorno
-            if (localStream) {
-                const call = peer.call(remoteId, localStream);
-                currentCall = call;
-                call.on('stream', (remoteStream) => {
-                    remoteVideo.srcObject = remoteStream;
-                });
+                // Comprime il pacchetto dati in Base64 per evitare errori di copia-incolla
+                localSdpTxt.value = btoa(JSON.stringify(peerConnection.localDescription));
+                appendLogMessage("👉 Codice Offerta Generato. Clicca su 'Copia Mio Codice' e invialo all'amico.");
+            } catch (e) {
+                console.error(e);
+                appendLogMessage("⚠️ Errore di inizializzazione. Assicurati che la pagina giri su Render/HTTPS.");
             }
         });
 
-        // Configurazione eventi del canale dati della chat unificata
-        function setupChatChannelEvents() {
-            const placeholder = chatMessages.querySelector('.chat-placeholder');
-            if (placeholder) placeholder.remove();
+        // Validazione codice incollato nel box (Utente B o Utente A per chiudere il cerchio)
+        btnAcceptRemote.addEventListener('click', async () => {
+            const rawSdp = remoteSdpTxt.value.trim();
+            if (!rawSdp) return alert("Incolla prima il codice del tuo amico nella casella numero 2.");
 
-            currentChatConn.on('open', () => {
-                appendLogMessage("Connessione P2P stabilita.");
-            });
+            try {
+                const parsedSdp = JSON.parse(atob(rawSdp));
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(parsedSdp));
 
-            currentChatConn.on('data', (data) => {
-                appendMessage(data, 'remote');
-            });
+                // Se l'utente riceve un'offerta, compila subito la risposta automatica di aggancio nel box 1
+                if (parsedSdp.type === 'offer') {
+                    const answer = await peerConnection.createAnswer();
+                    await peerConnection.setLocalDescription(answer);
+                    
+                    localSdpTxt.value = btoa(JSON.stringify(peerConnection.localDescription));
+                    appendLogMessage("👉 Risposta generata nel box 1. Copiala e rimandala all'amico.");
+                } else if (parsedSdp.type === 'answer') {
+                    appendLogMessage("⚡ Connessione WebRTC P2P stabilita con successo!");
+                }
+            } catch (err) {
+                alert("Codice non valido. Assicurati di aver copiato tutto il testo del tuo amico.");
+                console.error(err);
+            }
+        });
 
-            currentChatConn.on('close', () => {
-                appendLogMessage("L'interlocutore si è disconnesso.");
-                currentChatConn = null;
-            });
+        function bindDataChannelEvents() {
+            dataChannel.onopen = () => {
+                const placeholder = chatMessages.querySelector('.chat-placeholder');
+                if (placeholder) placeholder.remove();
+                appendLogMessage("💬 Chat P2P Connessa e Attiva!");
+            };
+            dataChannel.onmessage = (event) => {
+                appendMessage(event.data, 'remote');
+            };
         }
 
-        // Spedizione della frase e SVUOTAMENTO ATOMICO E ISTANTANEO DELLA CASELLA GARANTITO
+        // SPEDIZIONE FRASE E REFRESH ATOMICO ISTANTANEO DELL'INPUT CHAT
         function sendChatMessage() {
             const text = chatInput.value.trim();
-            
             if (!text) return;
 
-            // Se non c'è ancora un amico connesso, ripuliamo comunque la linea per non bloccare lo schermo
-            if (!currentChatConn) {
-                alert("Inserisci prima l'ID del tuo amico nella barra in alto per connetterti e poter inviare messaggi.");
+            if (!dataChannel || dataChannel.readyState !== "open") {
+                alert("La chat non è ancora attiva. Completa prima l'allineamento dei codici nel pannello in alto.");
                 chatInput.value = '';
-                chatInput.focus();
                 return;
             }
 
-            currentChatConn.send(text);
+            dataChannel.send(text);
             appendMessage(text, 'local');
             
-            // RESET DEFINITIVO DELL'INPUT CHAT
+            // RISOLUZIONE: Svuotamento e focus immediato per riprendere a scrivere al volo
             chatInput.value = '';
             chatInput.focus();
         }
 
         btnSendChat.addEventListener('click', sendChatMessage);
         chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChatMessage(); });
-<!-- === FINE SEZIONE 5: LOGICA JS - CHIAMATE, ASCOLTO E REFRESH DELLA CHAT === -->
+<!-- === FINE SEZIONE 5: COMPRESSIONE DISCONNESSIONE E LOGICA REFRESH INPUT CHAT === -->
 
 
-<!-- === INIZIO SEZIONE 6: LOGICA JS - SCREEN SHARE, INTERRUTTORI PERIFERICHE E CHIUSURA TAGS === -->
-<!-- Questa sezione chiude gli elementi logici, implementa lo spegnimento della cam e l'arresto del programma -->
-        // Condivisione Schermo
+<!-- === INIZIO SEZIONE 6: LOGICA JS - SWITCH VIDEO, CONTROLLI SPIA AD ICONA E CHIUSURA TAGS === -->
+<!-- Aggiorna in tempo reale i colori dei pallini (Verde/Rosso) e distrugge i flussi hardware all'uscita della pagina -->
+        // Condivisione Schermo Desktop Standalone
         btnShareScreen.addEventListener('click', async () => {
-            if (!currentCall) return alert("Devi essere attivamente connesso in chiamata per trasmettere lo schermo.");
-
+            if (!peerConnection) return;
             try {
                 if (!screenStream) {
                     screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-                    const videoTrack = screenStream.getVideoTracks();
-                    const sender = currentCall.peerConnection.getSenders().find(s => s.track.kind === 'video');
+                    const videoTrack = screenStream.getVideoTracks()[0];
+                    
+                    const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
                     if (sender) sender.replaceTrack(videoTrack);
 
                     localVideo.srcObject = screenStream;
@@ -411,7 +373,7 @@
                     stopScreenShare();
                 }
             } catch (err) {
-                console.error("Impossibile catturare lo schermo:", err);
+                console.error(err);
             }
         });
 
@@ -420,63 +382,48 @@
             screenStream.getTracks().forEach(track => track.stop());
             screenStream = null;
 
-            if (localStream) {
-                const videoTrack = localStream.getVideoTracks();
-                const sender = currentCall.peerConnection.getSenders().find(s => s.track.kind === 'video');
+            if (localStream && localStream.getVideoTracks().length > 0) {
+                const videoTrack = localStream.getVideoTracks()[0];
+                const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
                 if (sender) sender.replaceTrack(videoTrack);
                 localVideo.srcObject = localStream;
             }
-
             btnShareScreen.innerText = "🖥️ Condividi lo Schermo";
             btnShareScreen.classList.remove('btn-danger');
         }
 
-        // Toggles Hardware Mic e Camera con cambio colore istantaneo dei pallini spia (Verde/Rosso)
+        // INTERRUTTORI AD ICONA: Cambiano il colore del pallino (Verde = On, Rosso = Off) agendo sulle tracce
         btnToggleAudio.addEventListener('click', () => {
-            if (!localStream) return;
-            const tracks = localStream.getAudioTracks();
-            if (tracks.length === 0) return;
-            
+            if (!localStream || localStream.getAudioTracks().length === 0) return;
             isAudioMuted = !isAudioMuted;
-            tracks.forEach(track => track.enabled = !isAudioMuted);
+            localStream.getAudioTracks()[0].enabled = !isAudioMuted;
             
-            // Aggiorna cromaticamente la spia ad icona del microfono
+            // Cambia lo stato cromatico del pallino spia mic
             dotMic.className = `dot-status ${isAudioMuted ? 'dot-red' : 'dot-green'}`;
         });
 
         btnToggleVideo.addEventListener('click', () => {
-            if (!localStream) return;
-            const tracks = localStream.getVideoTracks();
-            if (tracks.length === 0) return;
-            
+            if (!localStream || localStream.getVideoTracks().length === 0) return;
             isVideoOff = !isVideoOff;
-            tracks.forEach(track => track.enabled = !isVideoOff);
+            localStream.getVideoTracks()[0].enabled = !isVideoOff;
             
-            // Aggiorna cromaticamente la spia ad icona della fotocamera
+            // Cambia lo stato cromatico del pallino spia cam
             dotCam.className = `dot-status ${isVideoOff ? 'dot-red' : 'dot-green'}`;
         });
 
-        // Pulsante Esci Universale e distruzione totale dei flussi hardware
+        // Pulsante ESCI: Arresto totale dei sensori fisici per spegnere i LED del computer
         btnExitGlobal.addEventListener('click', () => {
-            if (confirm("Vuoi davvero chiudere la sessione di chiamata e uscire dalla pagina?")) {
-                if (localStream) {
-                    localStream.getTracks().forEach(track => track.stop());
-                }
-                if (screenStream) {
-                    screenStream.getTracks().forEach(track => track.stop());
-                }
+            if (confirm("Vuoi chiudere la sessione di chiamata e uscire?")) {
+                if (localStream) localStream.getTracks().forEach(t => t.stop());
+                if (screenStream) screenStream.getTracks().forEach(t => t.stop());
                 if (audioAnimationId) cancelAnimationFrame(audioAnimationId);
                 if (audioContext) audioContext.close();
-                if (currentChatConn) currentChatConn.close();
-                if (peer) peer.destroy();
-                
+                if (peerConnection) peerConnection.close();
                 window.close();
-                
-                document.body.innerHTML = "<div style='display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif; font-size:1.2rem; background:#0f172a; color:#94a3b8;'>Sessione terminata con successo. Puoi chiudere questa scheda.</div>";
+                document.body.innerHTML = "<div style='display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif; background:#0f172a; color:#94a3b8;'>Sessione terminata. Puoi chiudere questa finestra.</div>";
             }
         });
 
-        // Funzioni Ausiliarie Grafiche
         function appendMessage(text, sender) {
             const msgDiv = document.createElement('div');
             msgDiv.className = `msg ${sender === 'local' ? 'msg-local' : 'msg-remote'}`;
@@ -493,21 +440,16 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        btnCopy.addEventListener('click', () => {
-            const idText = myIdDisplay.innerText;
-            if (idText.includes('...')) return;
-            navigator.clipboard.writeText(idText);
-            const prevText = btnCopy.innerText;
-            btnCopy.innerText = "Fatto!";
-            btnCopy.classList.add('btn-success');
-            setTimeout(() => {
-                btnCopy.innerText = prevText;
-                btnCopy.classList.remove('btn-success');
-            }, 1500);
+        btnCopyLocal.addEventListener('click', () => {
+            if (!localSdpTxt.value) return;
+            navigator.clipboard.writeText(localSdpTxt.value);
+            const prevText = btnCopyLocal.innerText;
+            btnCopyLocal.innerText = "Copiato!";
+            setTimeout(() => { btnCopyLocal.innerText = prevText; }, 1200);
         });
 
-        // Inizio del ciclo applicativo totale
-        startSystem();
+        // Esecuzione immediata ed autonoma del modulo hardware
+        startLocalHardware();
     </script>
 </body>
 </html>
